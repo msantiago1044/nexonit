@@ -56,11 +56,19 @@ function formatCurrency(value) {
 
 let nextId = 1;
 
+// Un único batch_id por sesión de pestaña: agrupa todas las facturas que el
+// usuario suba en esta visita bajo el mismo lote en Supabase.
+const sessionBatchId =
+  typeof crypto !== 'undefined' && crypto.randomUUID
+    ? crypto.randomUUID()
+    : `batch-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+
 export default function App() {
   const [queue, setQueue] = useState([]); // [{id, file, status, result, error}]
   const [isDragging, setIsDragging] = useState(false);
   const inputRef = useRef(null);
   const isProcessingRef = useRef(false);
+  const fgRef = useRef(null); // ref al ForceGraph2D, para ajustar la física y anclar el nodo central
 
   // -------------------------------------------------------------------------
   // Título dinámico de la pestaña según el estado global del lote
@@ -105,6 +113,7 @@ export default function App() {
             filename: item.file.name,
             mimeType: item.file.type,
             fileBase64: base64,
+            batchId: sessionBatchId,
           }),
         });
 
@@ -206,9 +215,10 @@ export default function App() {
           nodes.push({
             id: receptor.nit,
             name: receptor.razon_social || receptor.nit,
-            category: 'Receptor',
+            category: 'Tu empresa',
             color: '#f5f4f0',
-            val: 9,
+            val: 14,
+            isCenter: true, // ancla este nodo al centro del canvas (ver fx/fy abajo)
           });
         }
         links.push({ source: emisor.nit, target: receptor.nit });
@@ -246,6 +256,33 @@ export default function App() {
   }, [completedRows]);
 
   const legend = useMemo(() => legendEntries(), []);
+
+  // -------------------------------------------------------------------------
+  // Física del grafo en forma de estrella: el nodo "Tu empresa" (isCenter)
+  // queda fijo en el origen, y los proveedores se reparten alrededor por
+  // repulsión mutua + la atracción del link hacia el centro. Sin esto, la
+  // simulación de fuerzas por defecto deja flotar todos los nodos por igual
+  // y el receptor no se distingue como el centro real de la red.
+  useEffect(() => {
+    const fg = fgRef.current;
+    if (!fg || graphData.nodes.length === 0) return;
+
+    // Ancla el nodo central en el origen del canvas.
+    graphData.nodes.forEach((node) => {
+      if (node.isCenter) {
+        node.fx = 0;
+        node.fy = 0;
+      }
+    });
+
+    // Links más cortos y rígidos -> los proveedores quedan pegados al centro
+    // en vez de derivar lejos. Repulsión moderada entre nodos -> evita que
+    // los proveedores se amontonen unos sobre otros.
+    fg.d3Force('link')?.distance(90).strength(1);
+    fg.d3Force('charge')?.strength(-120);
+
+    fg.d3ReheatSimulation();
+  }, [graphData]);
 
   return (
     <div className="app-shell">
@@ -351,10 +388,24 @@ export default function App() {
                 </div>
               ) : (
                 <ForceGraph2D
+                  ref={fgRef}
                   graphData={graphData}
                   nodeLabel={(node) => `${node.name} — ${node.category}`}
                   nodeColor={(node) => node.color}
                   nodeVal={(node) => node.val}
+                  nodeCanvasObjectMode={(node) => (node.isCenter ? 'after' : undefined)}
+                  nodeCanvasObject={(node, ctx) => {
+                    if (!node.isCenter) return;
+                    // Anillo distintivo alrededor del nodo central, para que
+                    // se lea de inmediato como "tu empresa" frente a los
+                    // proveedores que orbitan alrededor.
+                    const radius = Math.sqrt(node.val) * 2 + 4;
+                    ctx.beginPath();
+                    ctx.arc(node.x, node.y, radius, 0, 2 * Math.PI);
+                    ctx.strokeStyle = '#06b6d4';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                  }}
                   linkColor={() => 'rgba(245, 244, 240, 0.25)'}
                   backgroundColor="transparent"
                   width={undefined}
