@@ -69,7 +69,7 @@ export default async function handler(req, res) {
     const isImage = mimeType.startsWith('image/');
     // glm-4v para imágenes/PDF visual, glm-4-flash como fallback rápido para
     // flujos de solo-texto si en el futuro se añade OCR previo.
-    const model = isImage ? 'glm-4v' : 'glm-4-flash';
+    const model = isImage ? 'glm-4.6v-flash' : 'glm-4.7-flash';
 
     const completion = await client.chat.completions.create({
       model,
