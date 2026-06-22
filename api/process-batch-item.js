@@ -90,6 +90,7 @@ export default async function handler(req, res) {
         },
       ],
       temperature: 0.1,
+      thinking: { type: 'disabled' },
     });
 
     const rawContent = completion.choices?.[0]?.message?.content || '';
