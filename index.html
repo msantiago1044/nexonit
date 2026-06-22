@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Título dinámico (estado de reposo). Se sobreescribe en runtime desde App.jsx -->
+  <title>📂 NexoNIT | Lector Contable Multi-Documento</title>
+  <meta name="description" content="Arrastra 50 facturas juntas. Obtén un Excel limpio con sus NITs, y descubre en un mapa de nodos de qué sector viene tu gasto. 100% gratis." />
+
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='80'%3E📂%3C/text%3E%3C/svg%3E" />
+
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#1e1b4b" />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="NexoNIT - Inteligencia de Proveedores por Lotes" />
+  <meta property="og:description" content="Arrastra 50 facturas juntas. Obtén un Excel limpio con sus NITs, y descubre en un mapa de nodos de qué sector viene tu gasto. 100% gratis." />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="NexoNIT" />
+  <meta property="og:locale" content="es_CO" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="NexoNIT - Inteligencia de Proveedores por Lotes" />
+  <meta name="twitter:description" content="Sube el mazo de facturas. El grafo hace el resto." />
+
+  <!-- Fuentes: display condensada de alto contraste + utilitaria monoespaciada para datos fiscales -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --indigo-950: #1e1b4b;
+      --indigo-900: #2a2566;
+      --indigo-800: #353080;
+      --paper: #f5f4f0;
+      --ink: #16142e;
+      --muted: #8b87b3;
+      --line: rgba(245, 244, 240, 0.12);
+      --orange: #f97316;
+      --green: #22c55e;
+      --cyan: #06b6d4;
+      --purple: #a855f7;
+      --slate: #64748b;
+      --font-display: 'Space Grotesk', system-ui, sans-serif;
+      --font-mono: 'IBM Plex Mono', monospace;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--indigo-950); font-family: var(--font-mono); }
+    #root { min-height: 100vh; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="module" src="/src/main.jsx"></script>
+</body>
+</html>
